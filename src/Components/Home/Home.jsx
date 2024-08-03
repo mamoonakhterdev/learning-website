@@ -6,11 +6,14 @@ import math from "../../assets/images/Math.jpg";
 import workbook from "../../assets/images/workbook.jpg";
 import banner from "../../assets/images/banner.jpg";
 import education from "../../assets/images/education.jpg";
-import educationtime from "../../assets/images/educationtime.jpg"
-import robot from "../../assets/images/robot.jpg"
+import educationtime from "../../assets/images/educationtime.jpg";
+import robot from "../../assets/images/robot.jpg";
 import kidz from "../../assets/images/kidz.jpg";
+import englishWorksheet from "../../assets/images/englishWorksheets.jpg"; // New image
+import scienceWorksheet from "../../assets/images/scienceWorksheets.jpg"; // New image
 import { logEvent } from 'firebase/analytics';
 import { analytics } from '../../firebaseConfig'; // Import Firebase analytics config
+import { useNavigate } from 'react-router-dom';
 
 const heroSectionStyle = {
   backgroundColor: '#f0f0f0',
@@ -36,7 +39,24 @@ const sectionStyle = {
   marginBottom: '40px',
 };
 
+const downloadSectionStyle = {
+  marginBottom: '40px',
+  textAlign: 'center',
+};
+
+const cardMediaStyle = {
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'pointer',
+};
+
+const cardMediaHoverStyle = {
+  transform: 'scale(1.05)',
+  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
+};
+
 const Home = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     logEvent(analytics, 'page_view', {
       page_title: 'Home',
@@ -44,6 +64,20 @@ const Home = () => {
       page_path: window.location.pathname,
     });
   }, []);
+
+  const handleRedirect = (path) => {
+    navigate(path);
+  };
+
+  const handleMouseOver = (e) => {
+    e.currentTarget.style.transform = cardMediaHoverStyle.transform;
+    e.currentTarget.style.boxShadow = cardMediaHoverStyle.boxShadow;
+  };
+
+  const handleMouseOut = (e) => {
+    e.currentTarget.style.transform = 'none';
+    e.currentTarget.style.boxShadow = 'none';
+  };
 
   return (
     <Container>
@@ -81,6 +115,60 @@ const Home = () => {
         >
           Whether you're preparing for exams or looking to enhance your understanding of key concepts, our worksheets offer valuable practice and are available for immediate download.
         </Typography>
+      </Box>
+
+      {/* Free Download Worksheets Section */}
+      <Box sx={downloadSectionStyle}>
+        <Grid container spacing={4} justifyContent="center" sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Card sx={cardStyle} onClick={() => handleRedirect('/english')}>
+              <CardMedia
+                component="img"
+                image={englishWorksheet}
+                alt="English Worksheet"
+                sx={cardMediaStyle}
+                onMouseOver={handleMouseOver}
+                onMouseOut={handleMouseOut}
+              />
+              <CardContent>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
+                >
+                  English Worksheets
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Download Free English Worksheets from Kindergarten to Grade 8
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Card sx={cardStyle} onClick={() => handleRedirect('/science')}>
+              <CardMedia
+                component="img"
+                image={scienceWorksheet}
+                alt="Science Worksheet"
+                sx={cardMediaStyle}
+                onMouseOver={handleMouseOver}
+                onMouseOut={handleMouseOut}
+              />
+              <CardContent>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
+                >
+                  Science Worksheets
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Download Free Science Worksheets from Kindergarten to Grade 8
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </Box>
 
       {/* Feature Points Section */}
@@ -177,7 +265,7 @@ const Home = () => {
             <Card sx={cardStyle}>
               <CardMedia
                 component="img"
-                image={workbook}
+                image={education}
                 alt="Benefit 1"
               />
               <CardContent>
@@ -186,10 +274,10 @@ const Home = () => {
                   component="div"
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
                 >
-                  Enhanced Learning
+                  Improved Learning
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Our worksheets are designed to enhance learning and comprehension.
+                  Enhance understanding and retention with practice materials that make learning engaging.
                 </Typography>
               </CardContent>
             </Card>
@@ -198,7 +286,7 @@ const Home = () => {
             <Card sx={cardStyle}>
               <CardMedia
                 component="img"
-                image={science}
+                image={workbook}
                 alt="Benefit 2"
               />
               <CardContent>
@@ -207,10 +295,10 @@ const Home = () => {
                   component="div"
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
                 >
-                  Flexible Access
+                  Accessible Resources
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Access our resources anytime, anywhere, on any device.
+                  Access a wide range of downloadable worksheets anytime, anywhere.
                 </Typography>
               </CardContent>
             </Card>
@@ -228,10 +316,10 @@ const Home = () => {
                   component="div"
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
                 >
-                  Comprehensive Coverage
+                  Boost Academic Performance
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Comprehensive coverage of subjects to ensure well-rounded education.
+                  Regular practice with our worksheets helps improve academic performance and build confidence.
                 </Typography>
               </CardContent>
             </Card>

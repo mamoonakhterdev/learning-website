@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <div>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <CssBaseline />
       {!isAdminRoute && <Header />}
       <main style={{ padding: isAdminRoute ? '20px' : '20px 0px', margin: isAdminRoute ? '0':"5vw 0" }}>

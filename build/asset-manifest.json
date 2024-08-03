@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/static/css/main.cf66cb7f.css",
+    "main.js": "/static/js/main.d61fe6b5.js",
+    "static/media/educationtime.jpg": "/static/media/educationtime.18ef92774670938a2922.jpg",
+    "static/media/Science.jpg": "/static/media/Science.6e6d193c7399142f10ef.jpg",
+    "static/media/Math.jpg": "/static/media/Math.1acf3d4fb5f88604d14a.jpg",
+    "static/media/scienceWorksheets.jpg": "/static/media/scienceWorksheets.2527b97ed2498aaa46df.jpg",
+    "static/media/education.jpg": "/static/media/education.3739adca823483bd1d0d.jpg",
+    "static/media/englishWorksheets.jpg": "/static/media/englishWorksheets.b6450c8edafc44561c0f.jpg",
+    "static/media/workbook.jpg": "/static/media/workbook.60b377cd09eeb62144be.jpg",
+    "static/media/English1.jpg": "/static/media/English1.644317cec06dd6e33951.jpg",
+    "static/media/kidz.jpg": "/static/media/kidz.e3773a25f7ff14162828.jpg",
+    "static/media/Science1.jpg": "/static/media/Science1.5764f023aef053f60145.jpg",
+    "static/media/banner.jpg": "/static/media/banner.8f918fdf8b229e726339.jpg",
+    "static/media/robot.jpg": "/static/media/robot.41cd42d086b446fc12dd.jpg",
+    "index.html": "/index.html",
+    "main.cf66cb7f.css.map": "/static/css/main.cf66cb7f.css.map",
+    "main.d61fe6b5.js.map": "/static/js/main.d61fe6b5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cf66cb7f.css",
+    "static/js/main.d61fe6b5.js"
+  ]
+}

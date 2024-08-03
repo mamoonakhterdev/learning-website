@@ -23,7 +23,7 @@ import { database } from "../firebaseConfig";
 import { useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import educationTime from "./../../src/assets/images/educationtime.jpg"
+
 const Component = styled(Box)`
   width: 80%;
   margin: 50px auto;
@@ -101,10 +101,37 @@ const Component = styled(Box)`
     justify-content: center;
   }
 `;
+const getDirectDownloadLink = (url) => {
+  if (url.includes("drive.google.com")) {
+    return getGoogleDriveDirectLink(url);
+  } else if (url.includes("dropbox.com")) {
+    return getDropboxDirectLink(url);
+  }
+  return url;
+};
+
+const getGoogleDriveDirectLink = (url) => {
+  // Extract the file ID from the Google Drive URL
+  const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)(?:\/|$)/);
+  if (fileIdMatch) {
+    // Return the direct download link format
+    return `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+  }
+  // Throw an error if the URL is invalid
+  throw new Error("Invalid Google Drive URL format");
+};
+
+const getDropboxDirectLink = (url) => {
+  // Convert the Dropbox URL to direct download
+  return url.replace(/dl=0$/, "dl=1");
+};
+
 
 const downloadFile = async (url, onDownloadComplete) => {
   try {
+    console.log("Converting before");
     const directUrl = getDirectDownloadLink(url);
+    console.log("Converting After");
     const link = document.createElement("a");
     link.href = directUrl;
     link.download = directUrl.split("/").pop().split("?")[0];
@@ -142,35 +169,21 @@ const downloadFile = async (url, onDownloadComplete) => {
   }
 };
 
-const getDirectDownloadLink = (url) => {
-  if (url.includes("drive.google.com")) {
-    return getGoogleDriveDirectLink(url);
-  } else if (url.includes("dropbox.com")) {
-    return getDropboxDirectLink(url);
-  }
-  return url;
-};
 
-const getGoogleDriveDirectLink = (url) => {
-  const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (fileIdMatch) {
-    return `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
-  }
-  return url;
-};
 
-const getDropboxDirectLink = (url) => {
-  return url.replace(/dl=0$/, "dl=1");
-};
+
 
 export default function DataTable() {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [grades, setGrades] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+
   const [subjects, setSubjects] = useState([]);
   const [gradeFilter, setGradeFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [subCategoryFilter, setSubCategoryFilter] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -186,17 +199,13 @@ export default function DataTable() {
     if (pathParts.length > 2) {
       let subject = pathParts[1];
       let grade = pathParts[2];
-
+  
+      // Format subject and grade to match stored values
       subject = subject.charAt(0).toUpperCase() + subject.slice(1);
-
-      if (grade.includes("grade")) {
-        grade = grade.replace("grade-", "Grade ");
-      } else if (grade.includes("-")) {
-        grade = grade.charAt(0).toUpperCase() + grade.slice(1);
-      }
-
-      grade = grade.charAt(0).toUpperCase() + grade.slice(1);
-
+      grade = grade.replace("grade-", "Grade");
+      grade = grade.replace("-", ""); // Replace hyphen with space
+  
+      // Update state with formatted values
       setPathSubject(subject);
       setPathGrade(grade);
       setSubjectFilter(subject);
@@ -206,10 +215,10 @@ export default function DataTable() {
 
   useEffect(() => {
     fetchUsersByFilters();
-  }, [categoryFilter, pathGrade, pathSubject]);
+  }, [categoryFilter, subCategoryFilter, pathGrade, pathSubject]);
 
   useEffect(() => {
-    const usersRef = ref(database, "users");
+    const usersRef = ref(database, "worksheets");
     setLoading(true);
     get(usersRef)
       .then((snapshot) => {
@@ -220,6 +229,7 @@ export default function DataTable() {
               ...value,
             })
           );
+          console.log("Fetched users:", usersArray);
           setUsers(usersArray);
 
           const uniqueGrades = [
@@ -248,7 +258,7 @@ export default function DataTable() {
 
   const fetchUsersByFilters = async () => {
     try {
-      const usersRef = ref(database, "users");
+      const usersRef = ref(database, "worksheets");
       setLoading(true);
       const snapshot = await get(usersRef);
       if (snapshot.exists()) {
@@ -259,40 +269,55 @@ export default function DataTable() {
           })
         );
 
+        console.log("Users array before filtering:", usersArray);
+
+        // Filter users based on the selected subject and grade
         const filtered = usersArray.filter(
           (user) =>
             user.grade === pathGrade &&
             user.subject === pathSubject &&
-            (categoryFilter ? user.category === categoryFilter : true)
+            (categoryFilter ? user.category === categoryFilter : true) &&
+            (subCategoryFilter ? user.subCategory === subCategoryFilter : true)
         );
 
+        console.log("Filtered users:", filtered);
         setFilteredUsers(filtered);
-        console.log(filtered);
-      } else {
-        setFilteredUsers([]);
+
+        // Update categories and subcategories based on the selected subject and grade
+        const uniqueCategories = [
+          ...new Set(
+            usersArray
+              .filter(
+                (user) =>
+                  user.subject === pathSubject &&
+                  user.grade === pathGrade
+              )
+              .map((user) => user.category)
+          ),
+        ];
+        setCategories(uniqueCategories);
+
+        if (categoryFilter) {
+          const uniqueSubcategories = [
+            ...new Set(
+              usersArray
+                .filter(
+                  (user) =>
+                    user.subject === pathSubject &&
+                    user.grade === pathGrade &&
+                    user.category === categoryFilter
+                )
+                .map((user) => user.subCategory)
+            ),
+          ];
+          setSubCategories(uniqueSubcategories);
+        }
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching users by filters:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDownload = (user) => {
-    setDownloading(user.userId);
-    downloadFile(user.download_link, () => {
-      setDownloading(null);
-      toast.success("Download Successfully!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -306,23 +331,15 @@ export default function DataTable() {
 
   return (
     <Component>
-      <img
-        src={educationTime}
-        alt="Top Image"
-        style={{ width: "80%", marginBottom: "20px" }}
-      />
-      <Typography variant="h4">Filtered Data</Typography>
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
+      <Typography variant="h4">Data Table</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}>
           <TextField
-            select
-            label="Select Grade"
-            value={pathGrade}
-            onChange={(e) => setGradeFilter(e.target.value)}
             fullWidth
-            variant="outlined"
-            size="small"
-            disabled
+            select
+            label="Grade"
+            value={gradeFilter}
+            onChange={(e) => setGradeFilter(e.target.value)}
           >
             {grades.map((grade) => (
               <MenuItem key={grade} value={grade}>
@@ -331,15 +348,16 @@ export default function DataTable() {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} md={4}>
           <TextField
-            select
-            label="Select Category"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
             fullWidth
-            variant="outlined"
-            size="small"
+            select
+            label="Category"
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setSubCategoryFilter("");
+            }}
           >
             {categories.map((category) => (
               <MenuItem key={category} value={category}>
@@ -348,85 +366,79 @@ export default function DataTable() {
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} md={4}>
           <TextField
-            select
-            label="Select Subject"
-            value={pathSubject}
-            onChange={(e) => setSubjectFilter(e.target.value)}
             fullWidth
-            variant="outlined"
-            size="small"
-            disabled
+            select
+            label="Sub-Category"
+            value={subCategoryFilter}
+            onChange={(e) => setSubCategoryFilter(e.target.value)}
           >
-            {subjects.map((subject) => (
-              <MenuItem key={subject} value={subject}>
-                {subject}
+            {subCategories.map((subCategory) => (
+              <MenuItem key={subCategory} value={subCategory}>
+                {subCategory}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
       </Grid>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Grade</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Subject</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Download Link</TableCell>
-              <TableCell>Download File</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={6} align="center">
-                  <CircularProgress />
-                </TableCell>
+                <TableCell>Grade</TableCell>
+                <TableCell>Subject</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>Sub-Category</TableCell>
+                <TableCell>Download</TableCell>
               </TableRow>
-            ) : (
-              filteredUsers
+            </TableHead>
+            <TableBody>
+              {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((user) => (
                   <TableRow key={user.userId}>
                     <TableCell>{user.grade}</TableCell>
-                    <TableCell>{user.category}</TableCell>
                     <TableCell>{user.subject}</TableCell>
-                    <TableCell>{user.description}</TableCell>
+                    <TableCell>{user.category}</TableCell>
+                    <TableCell>{user.subCategory}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={() => handleDownload(user)}
                         startIcon={<CloudDownload />}
-                        disabled={downloading === user.userId}
+                        onClick={() => {
+                          setDownloading(user.userId);
+                          downloadFile(user.download_link, () => {
+                            setDownloading(null);
+                          });
+                        }}
                       >
-                        {downloading === user.userId ? (
-                          <CircularProgress size={24} color="inherit" />
-                        ) : (
-                          "Download"
-                        )}
+                        {downloading === user.userId
+                          ? "Downloading..."
+                          : "Download"}
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredUsers.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        className="pagination"
-      />
+                ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={filteredUsers.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            className="pagination"
+          />
+        </TableContainer>
+      )}
+
       <ToastContainer />
     </Component>
   );

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemText, Divider, Collapse, ListItemIcon, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { ExpandLess, ExpandMore, Home, Science, Calculate, Dashboard } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, Home, Science, TextFields, Dashboard } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -14,12 +14,12 @@ const subjects = [
   {
     subject: 'Science',
     icon: <Science sx={{ color: '#fff' }} />,
-    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
   },
   {
-    subject: 'Math',
-    icon: <Calculate sx={{ color: '#fff' }} />,
-    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+    subject: 'English',
+    icon: <TextFields sx={{ color: '#fff' }} />, // Updated icon for English
+    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
   },
 ];
 

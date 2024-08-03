@@ -1,0 +1,36 @@
+.info-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .info-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+  }
+  
+  .grade-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .grade-card h3 {
+    margin-bottom: 10px;
+  }
+  
+  .grade-card ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .grade-card li {
+    margin-bottom: 5px;
+  }
+  

@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import React, { useEffect } from 'react';
 import { Container, Typography, Box, Grid, Card, CardContent, CardMedia } from '@mui/material';
-import science from "../../assets/images/Science.jpg";
+import { Link } from 'react-router-dom';
 import math from "../../assets/images/Math.jpg";
 import workbook from "../../assets/images/workbook.jpg";
 import banner from "../../assets/images/banner.jpg";
@@ -14,6 +14,7 @@ import scienceWorksheet from "../../assets/images/scienceWorksheets.jpg"; // New
 import { logEvent } from 'firebase/analytics';
 import { analytics } from '../../firebaseConfig'; // Import Firebase analytics config
 import { useNavigate } from 'react-router-dom';
+import browseworksheet from "../../assets/images/worksheetbrowse.jpg";
 
 const heroSectionStyle = {
   backgroundColor: '#f0f0f0',
@@ -33,6 +34,7 @@ const cardStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   padding: '20px',
+  height: '100%',
 };
 
 const sectionStyle = {
@@ -45,6 +47,7 @@ const downloadSectionStyle = {
 };
 
 const cardMediaStyle = {
+  width: '100%',
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   cursor: 'pointer',
 };
@@ -120,50 +123,24 @@ const Home = () => {
       {/* Free Download Worksheets Section */}
       <Box sx={downloadSectionStyle}>
         <Grid container spacing={4} justifyContent="center" sx={{ mt: 2 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={cardStyle} onClick={() => handleRedirect('/english')}>
+          <Grid item xs={12}>
+            <Card sx={cardStyle} onClick={() => handleRedirect('/free-worksheets')}>
               <CardMedia
                 component="img"
-                image={englishWorksheet}
-                alt="English Worksheet"
+                image={browseworksheet}
+                alt="Browse Worksheet"
                 sx={cardMediaStyle}
                 onMouseOver={handleMouseOver}
                 onMouseOut={handleMouseOut}
               />
               <CardContent>
                 <Typography
+                  component={Link}
+                  to="/free-worksheets"
                   variant="h6"
-                  component="div"
-                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
+                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }, textDecoration: 'none', color: 'inherit' }}
                 >
-                  English Worksheets
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Download Free English Worksheets from Kindergarten to Grade 8
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={cardStyle} onClick={() => handleRedirect('/science')}>
-              <CardMedia
-                component="img"
-                image={scienceWorksheet}
-                alt="Science Worksheet"
-                sx={cardMediaStyle}
-                onMouseOver={handleMouseOver}
-                onMouseOut={handleMouseOut}
-              />
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  component="div"
-                  sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
-                >
-                  Science Worksheets
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Download Free Science Worksheets from Kindergarten to Grade 8
+                  Browse Worksheet
                 </Typography>
               </CardContent>
             </Card>
@@ -295,10 +272,10 @@ const Home = () => {
                   component="div"
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
                 >
-                  Accessible Resources
+                  Easy Access
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Access a wide range of downloadable worksheets anytime, anywhere.
+                  Download and print worksheets from anywhere at any time.
                 </Typography>
               </CardContent>
             </Card>
@@ -316,10 +293,10 @@ const Home = () => {
                   component="div"
                   sx={{ fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' } }}
                 >
-                  Boost Academic Performance
+                  Comprehensive Coverage
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Regular practice with our worksheets helps improve academic performance and build confidence.
+                  Cover key topics and concepts across Math and Science.
                 </Typography>
               </CardContent>
             </Card>

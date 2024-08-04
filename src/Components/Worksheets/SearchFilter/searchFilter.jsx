@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, List, ListItem, useTheme, useMediaQuery } from '@mui/material';
 import science1 from "../../../assets/images/Science1.jpg";
-import english1 from "../../../assets/images/English1.jpg";
+import english1 from "../../../assets/images/english1.jpg";
 import FilteredData from './filteredData';
 
 const SearchFilter = ({ query }) => {

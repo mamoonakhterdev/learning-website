@@ -3,13 +3,16 @@ import { AppBar, Toolbar, IconButton, Typography, TextField, useMediaQuery, useT
 import MenuIcon from '@mui/icons-material/Menu';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SearchIcon from '@mui/icons-material/Search';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Link, useNavigate } from 'react-router-dom';
 import DrawerComponent from '../Drawar/Drawar';
 import Cookies from 'js-cookie';
+import { Logout } from '@mui/icons-material';
 
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const theme = useTheme();
@@ -35,10 +38,23 @@ const Header = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear authentication tokens and update state
+    Cookies.remove('jwt');
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+    navigate('/login');
+  };
+
   useEffect(() => {
+    // Fetch the token from cookies
     const token = Cookies.get('jwt');
     if (token) {
-      setIsAdmin(true);
+      setIsAuthenticated(true);
+      setIsAdmin(token.includes('admin')); // Replace with your own admin check
+    } else {
+      setIsAuthenticated(false);
+      setIsAdmin(false);
     }
   }, []);
 
@@ -112,6 +128,23 @@ const Header = () => {
               >
                 <AdminPanelSettingsIcon />
               </IconButton>
+            )}
+            {isAuthenticated && (
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="logout"
+                onClick={handleLogout}
+                sx={{ marginLeft: 1 }}
+              >
+                <Logout />
+              </IconButton>
+            )}
+            {!isAuthenticated && (
+              <>
+                <button className='btn btn-primary' onClick={()=> navigate('/login')}>Login</button>
+                <button className='btn btn-secondary m-lg-2' onClick={()=> navigate('/signup')}>Sign Up</button>
+              </>
             )}
           </div>
         </Toolbar>

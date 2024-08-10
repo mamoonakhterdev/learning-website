@@ -1,0 +1,43 @@
+/* src/Login.css */
+.login-container {
+    height: 100vh;
+    display: flex;
+  }
+  
+  .login-text {
+    flex: 1;
+    background: #f8f9fa;
+    text-align: center;
+    padding: 50px;
+    background-image: url('https://via.placeholder.com/800x600'); /* Optional background image */
+    background-size: cover;
+    color: #ffffff;
+  }
+  
+  .login-form {
+    flex: 1;
+    padding: 50px;
+  }
+  
+  h1 {
+    font-size: 3rem;
+  }
+  
+  p.lead {
+    font-size: 1.25rem;
+  }
+  
+  .text-danger {
+    color: #dc3545;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+  

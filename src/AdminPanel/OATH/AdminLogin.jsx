@@ -6,8 +6,9 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import Cookies from 'js-cookie';
-import { auth } from '../../firebaseConfig';
+import { auth, database } from '../../firebaseConfig';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { ref, get } from "firebase/database";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './AuthContext';
@@ -25,39 +26,65 @@ const AdminLogin = () => {
 
   const navigate = useNavigate();
 
+  const checkAdminCredentials = async (email, password) => {
+    const adminRef = ref(database, 'admin'); // Replace '.' in email with '_' for Firebase key compatibility
+    const adminSnap = await get(adminRef);
+    console.log(adminRef);
+    if (adminSnap.exists()) {
+      const adminData = adminSnap.val();
+      return adminData.password === password; // You should hash passwords in a real-world application
+    }
+    return false;
+  };
+
   const handleLogin = async (values) => {
     setIsSubmitting(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-      if (user) {
-        const setCookieOptions = {
-          expires: 7,
-          sameSite: 'strict'
-        };
+      const isAdminValid = await checkAdminCredentials(values.email, values.password);
+      console.log(isAdminValid);
+      if (isAdminValid) {
+        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+        const user = userCredential.user;
+        if (user) {
+          const setCookieOptions = {
+            expires: 7,
+            sameSite: 'strict'
+          };
 
-        if (window.location.protocol === 'https:') {
-          setCookieOptions.secure = true;
+          if (window.location.protocol === 'https:') {
+            setCookieOptions.secure = true;
+          }
+
+          Cookies.set('jwt', user.accessToken, setCookieOptions);
+          localStorage.setItem('isAdmin', 'true');
+          
+          toast.success('Login successful!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+
+          // Delay updating isAuthenticated and navigation
+          setTimeout(() => {
+            setIsAuthenticated(true);
+          }, 2000); // 2 seconds delay
         }
-
-        Cookies.set('jwt', user.accessToken, setCookieOptions);
-        localStorage.setItem('isAdmin', 'true');
-        
-        toast.success('Login successful!', {
+      } else {
+        toast.error('Invalid email or password.', {
           position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
+          autoClose: 5000,
+          hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
           theme: "colored",
         });
-
-        // Delay updating isAuthenticated and navigation
-        setTimeout(() => {
-          setIsAuthenticated(true);
-        }, 2000); // 2 seconds delay
       }
     } catch (error) {
       let errorMessage = 'An error occurred. Please try again later.';

@@ -47,17 +47,19 @@ const EnglishWorksheet = () => {
       }
     }, 100); // Update every 100ms
   };
+
   const navigate = useNavigate();
-  function backToWroksheet(){
+  const backToWroksheet = () => {
     navigate('/free-worksheets');
-  }
+  };
 
   return (
     <Container fluid>
+      <button className='btn btn-outline-dark mb-1' onClick={() => backToWroksheet()}>&#x2190; Back</button>
+
       <Row className="my-4">
         {/* Left Container with Grades Box */}
         <Col xs={12} md={2} className="d-none d-md-block">
-        <button className='btn btn-outline-dark mb-1' onClick={()=> backToWroksheet()}>&#x2190; Back</button>
 
           <Box
             sx={{
@@ -127,71 +129,71 @@ const EnglishWorksheet = () => {
             <Typography variant="body1" paragraph>
               Explore our collection of English worksheets designed to cover a broad range of topics including grammar, vocabulary, and reading comprehension. Our worksheets are crafted to engage students and enhance their understanding of the English language through various activities and exercises.
             </Typography>
-            <Typography variant="h5" gutterBottom>English Worksheets By Grade</Typography>
-            <Grid container spacing={2}>
-              {englishGrades.map((grade) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={grade}>
-                  <Button
-                    type='button'
-                    onClick={() => handleGradeClick(grade)}
-                    className={`btn ${animate ? 'animate__animated animate__fadeIn' : ''}`}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                    }}
-                  >
-                    {grade}
-                  </Button>
+            
+            {/* Conditionally render grade buttons */}
+            {!selectedGrade && (
+              <>
+                <Typography variant="h5" gutterBottom>English Worksheets By Grade</Typography>
+
+                <Grid container spacing={2}>
+                  {englishGrades.map((grade) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={grade}>
+                      <Button
+                        type='button'
+                        onClick={() => handleGradeClick(grade)}
+                        className={`btn ${animate ? 'animate__animated animate__fadeIn' : ''}`}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                        }}
+                      >
+                        {grade}
+                      </Button>
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
+              </>
+            )}
+            
             {/* Show loading bar if loading */}
             {loading && (
-              <Box sx={{ marginTop: 2 }}>
-                <Typography variant="h6">Loading...</Typography>
+              <Box sx={{ width: '100%', marginTop: 2 }}>
                 <LinearProgress variant="determinate" value={loadingProgress} />
               </Box>
             )}
-            {/* Render content based on the selected grade */}
+
+            {/* Render EnglishGradeContent when a grade is selected and not loading */}
             {!loading && selectedGrade && <EnglishGradeContent grade={selectedGrade} />}
           </Box>
         </Col>
 
-        {/* Right Container with Two Images */}
+        {/* Right Container */}
         <Col xs={12} md={2} className="d-none d-md-block">
           <Box
+            component="img"
+            src={rightImage1}
+            alt="Browse Worksheets"
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 2,
+              width: '100%',
+              height: 'auto',
+              maxWidth: '100%',
+              borderRadius: 2,
+              marginBottom: 2,
+              objectFit: 'cover',
             }}
-          >
-            <Box
-              component="img"
-              src={rightImage1}
-              alt="Right Container Image 1"
-              sx={{
-                width: '100%',
-                height: 'auto',
-                maxWidth: '200px',
-                borderRadius: 2,
-                objectFit: 'cover',
-              }}
-            />
-            <Box
-              component="img"
-              src={rightImage2}
-              alt="Right Container Image 2"
-              sx={{
-                width: '100%',
-                height: 'auto',
-                maxWidth: '200px',
-                borderRadius: 2,
-                objectFit: 'cover',
-              }}
-            />
-          </Box>
+          />
+          <Box
+            component="img"
+            src={rightImage2}
+            alt="Education Time"
+            sx={{
+              width: '100%',
+              height: 'auto',
+              maxWidth: '100%',
+              borderRadius: 2,
+              objectFit: 'cover',
+            }}
+          />
         </Col>
       </Row>
     </Container>

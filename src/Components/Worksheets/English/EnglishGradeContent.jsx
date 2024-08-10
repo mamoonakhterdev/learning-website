@@ -1,147 +1,221 @@
-import React from 'react';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import React, { useState, useEffect } from 'react';
+import { get, ref } from "firebase/database";
+import { database } from "../../../firebaseConfig";
+import { Link } from 'react-router-dom';
+import EnglishSubcategory from './EnglishSubcategory'; // Update to English subcategory component
+import { Box, CircularProgress, Grid } from '@mui/material';
+import EnglishItemDetails from './EnglishItemDetails'; // Update to English item details component
 
-// Define separate functions for each grade's content
-const getGrade1Content = () => (
-  <>
-    <Typography variant="body1">
-      Explore activities that help with alphabet recognition, simple sentence construction, and basic vocabulary building.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Alphabet tracing worksheets, basic word lists, and simple sentence exercises.
-    </Typography>
-  </>
-);
+const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, '');
 
-const getGrade2Content = () => (
-  <>
-    <Typography variant="body1">
-      Activities focus on improving reading comprehension, grammar basics, and expanding vocabulary.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Reading passages, grammar exercises, and vocabulary-building activities.
-    </Typography>
-  </>
-);
-
-const getGrade3Content = () => (
-  <>
-    <Typography variant="body1">
-      Emphasis on reading comprehension, writing short paragraphs, and understanding sentence structure.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Comprehension exercises, paragraph writing prompts, and sentence structure activities.
-    </Typography>
-  </>
-);
-
-const getGrade4Content = () => (
-  <>
-    <Typography variant="body1">
-      Focus on reading comprehension, narrative writing, and grammar skills, including parts of speech.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Narrative prompts, grammar worksheets, and comprehension questions.
-    </Typography>
-  </>
-);
-
-const getGrade5Content = () => (
-  <>
-    <Typography variant="body1">
-      Activities aimed at improving essay writing, advanced reading comprehension, and detailed grammar exercises.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Essay prompts, complex comprehension passages, and detailed grammar worksheets.
-    </Typography>
-  </>
-);
-
-const getGrade6Content = () => (
-  <>
-    <Typography variant="body1">
-      Emphasis on critical reading skills, writing essays, and understanding advanced grammar concepts.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Critical reading exercises, essay topics, and advanced grammar drills.
-    </Typography>
-  </>
-);
-
-const getGrade7Content = () => (
-  <>
-    <Typography variant="body1">
-      Focus on analytical reading, advanced writing techniques, and detailed grammar analysis.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Analytical reading passages, writing prompts, and comprehensive grammar exercises.
-    </Typography>
-  </>
-);
-
-const getGrade8Content = () => (
-  <>
-    <Typography variant="body1">
-      Activities for refining writing skills, in-depth reading analysis, and mastering complex grammar rules.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Writing prompts, reading analysis exercises, and complex grammar worksheets.
-    </Typography>
-  </>
-);
-
-const getKindergartenContent = () => (
-  <>
-    <Typography variant="body1">
-      Fun and engaging activities focusing on letter recognition, basic vocabulary, and simple sentence formation.
-    </Typography>
-    <Typography variant="body1">
-      <strong>Resources:</strong> Letter matching games, simple word lists, and sentence-building activities.
-    </Typography>
-  </>
-);
-
-// Function to get content based on grade
-const getGradeContent = (grade) => {
-  switch (grade) {
-    case 'Grade 1':
-      return getGrade1Content();
-    case 'Grade 2':
-      return getGrade2Content();
-    case 'Grade 3':
-      return getGrade3Content();
-    case 'Grade 4':
-      return getGrade4Content();
-    case 'Grade 5':
-      return getGrade5Content();
-    case 'Grade 6':
-      return getGrade6Content();
-    case 'Grade 7':
-      return getGrade7Content();
-    case 'Grade 8':
-      return getGrade8Content();
-    case 'Kindergarten':
-      return getKindergartenContent();
-    default:
-      return (
-        <Typography variant="body1">
-          Please select a grade to view the content.
-        </Typography>
-      );
+const getGradeContent = (grade, subject, data, onCategoryClick) => {
+  if (!data) {
+    return <p>Loading content...</p>;
   }
+
+  const normGrade = normalize(grade);
+  const normSubject = normalize(subject);
+
+  const filteredData = data.filter(item => {
+    const itemGrade = normalize(item.grade);
+    const itemSubject = normalize(item.subject);
+    return itemGrade === normGrade && itemSubject === normSubject;
+  });
+
+  const uniqueCategories = Array.from(new Set(filteredData.map(item => item.category)));
+
+  if (uniqueCategories.length === 0) {
+    return <p>No content available for {grade} in {subject}.</p>;
+  }
+
+  return (
+    <Grid container spacing={1}>
+      {uniqueCategories.map((category, index) => (
+        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          <Box 
+            sx={{
+              borderRadius: 1,
+              padding: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              boxShadow: 'none',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            }}
+          >
+            <Link 
+              to="#" 
+              onClick={(e) => {
+                e.preventDefault();
+                onCategoryClick(category, filteredData);
+              }} 
+              className="text-decoration-underline text-primary"
+            >
+              {category}
+            </Link>
+          </Box>
+        </Grid>
+      ))}
+    </Grid>
+  );
 };
 
+// Grade-specific components
+const Grade1EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 1</h5>
+    {getGradeContent('Grade 1', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade2EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 2</h5>
+    {getGradeContent('Grade 2', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade3EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 3</h5>
+    {getGradeContent('Grade 3', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade4EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 4</h5>
+    {getGradeContent('Grade 4', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade5EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 5</h5>
+    {getGradeContent('Grade 5', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade6EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 6</h5>
+    {getGradeContent('Grade 6', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade7EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 7</h5>
+    {getGradeContent('Grade 7', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const Grade8EnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Grade 8</h5>
+    {getGradeContent('Grade 8', 'English', data, onCategoryClick)}
+  </div>
+);
+
+const KindergartenEnglishContent = ({ data, onCategoryClick }) => (
+  <div className='text-start'>
+    <h5>Additional Content for Kindergarten</h5>
+    {getGradeContent('Kindergarten', 'English', data, onCategoryClick)}
+  </div>
+);
+
+// Main component to handle different grades
 const EnglishGradeContent = ({ grade }) => {
+  const [data, setData] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [subcategories, setSubcategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState([]);
+  const [originalItems, setOriginalItems] = useState([]);
+  const [showGradeContent, setShowGradeContent] = useState(true);
+  const [showSubcategory, setShowSubcategory] = useState(false);
+  const [showItemDetails, setShowItemDetails] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dataRef = ref(database, 'worksheets');
+        const snapshot = await get(dataRef);
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()));
+        } else {
+          console.log("No data available");
+        }
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleCategoryClick = (category, filteredData) => {
+    setLoading(true);
+    setSelectedCategory(category);
+
+    const filteredItems = filteredData.filter(item => item.category === category);
+    const uniqueSubcategories = Array.from(new Set(filteredItems.map(item => item.subCategory)));
+    setSubcategories(uniqueSubcategories);
+    setOriginalItems(filteredItems); // Store the original filtered items
+    setItems(filteredItems); // Initially set the same as filtered items
+    setShowGradeContent(false);
+    setShowSubcategory(true);
+    setLoading(false);
+  };
+
+  const handleSubcategoryClick = (subcategory) => {
+    setLoading(true);
+    const filteredItems = originalItems.filter(item => item.subCategory === subcategory);
+    setItems(filteredItems);
+    setShowSubcategory(false);
+    setShowItemDetails(true);
+    setLoading(false);
+  };
+
+  const gradeContentMapping = {
+    'Grade 1': <Grade1EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 2': <Grade2EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 3': <Grade3EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 4': <Grade4EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 5': <Grade5EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 6': <Grade6EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 7': <Grade7EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Grade 8': <Grade8EnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+    'Kindergarten': <KindergartenEnglishContent data={data} onCategoryClick={handleCategoryClick} />,
+  };
+
   return (
-    <Box sx={{ marginTop: 4 }}>
-      <Typography variant="h6" gutterBottom>
-        {grade} Content
-      </Typography>
-      <Box sx={{ marginTop: 2 }}>
-        {getGradeContent(grade)}
-      </Box>
-    </Box>
+    <div className="mt-4">
+      <h6>{grade} English Content</h6>
+      <div className="mt-2">
+        {showGradeContent && gradeContentMapping[grade]}
+      </div>
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <CircularProgress />
+        </Box>
+      )}
+      {/* Render subcategories if a category is selected */}
+      {!loading && showSubcategory && (
+        <div className="mt-4">
+          <EnglishSubcategory subcategories={subcategories} onSubcategoryClick={handleSubcategoryClick} items={originalItems} />
+        </div>
+      )}
+      {/* Render item details if a subcategory is selected */}
+      {!loading && showItemDetails && (
+        <div className="mt-4">
+          <EnglishItemDetails items={items} />
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -1,34 +1,23 @@
-// src/Components/DrawerComponent.js
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Drawer, List, ListItem, ListItemText, Divider, Collapse, ListItemIcon, Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { ExpandLess, ExpandMore, Home, Science, TextFields, Dashboard } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, Home, Science, TextFields, Dashboard, Settings } from '@mui/icons-material';
+import { ClientContext } from '../../Route/ClientAuth/ClientContext';
 
 const drawerWidth = 240;
 
 const drawerItems = [
   { text: 'Home', path: '/' },
+  {text: 'Setting', path: '/setting'}
 ];
 
-const subjects = [
-  {
-    subject: 'Science',
-    icon: <Science sx={{ color: '#fff' }} />,
-    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
-  },
-  {
-    subject: 'English',
-    icon: <TextFields sx={{ color: '#fff' }} />, // Updated icon for English
-    grades: ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
-  },
-];
+
 
 const DrawerComponent = ({ open, onClose, isAuthenticated }) => {
+
+  const { userData } = useContext(ClientContext);
   const [openDropdown, setOpenDropdown] = useState('');
 
-  const handleDropdownClick = (subject) => {
-    setOpenDropdown(openDropdown === subject ? '' : subject);
-  };
 
   // Function to handle closing the drawer and hiding dropdowns
   const handleClose = () => {
@@ -43,7 +32,7 @@ const DrawerComponent = ({ open, onClose, isAuthenticated }) => {
       open={open}
       onClose={handleClose}
       ModalProps={{
-        keepMounted: true, // Better open performance on mobile.
+        keepMounted: true,
         onBackdropClick: handleClose,
       }}
       sx={{
@@ -52,12 +41,13 @@ const DrawerComponent = ({ open, onClose, isAuthenticated }) => {
         '& .MuiDrawer-paper': {
           width: drawerWidth,
           boxSizing: 'border-box',
-          backgroundColor: '#3f51b5', // Match with header background
+          backgroundColor: '#3f51b5',
           color: '#fff',
         },
       }}
     >
       <Box sx={{ padding: '16px' }}>
+        <Typography variant="h6">{userData === null ? "Login":userData.name}</Typography>
         <Typography variant="h6">Menu</Typography>
       </Box>
       <Divider />
@@ -65,37 +55,10 @@ const DrawerComponent = ({ open, onClose, isAuthenticated }) => {
         {drawerItems.map((item) => (
           <ListItem button component={Link} to={item.path} key={item.text} onClick={handleClose}>
             <ListItemIcon>
-              <Home sx={{ color: '#fff' }} />
+              {item.text === "Home" ? <Home sx={{ color: '#fff' }} />:<Settings sx={{color: '#fff'}} />}
             </ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
-        ))}
-        {subjects.map((subject) => (
-          <React.Fragment key={subject.subject}>
-            <ListItem button onClick={() => handleDropdownClick(subject.subject)}>
-              <ListItemIcon>
-                {subject.icon}
-              </ListItemIcon>
-              <ListItemText primary={subject.subject} />
-              {openDropdown === subject.subject ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openDropdown === subject.subject} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {subject.grades.map((grade) => (
-                  <ListItem
-                    button
-                    component={Link}
-                    to={`/${subject.subject.toLowerCase()}/${grade.toLowerCase().replace(' ', '-')}`}
-                    key={grade}
-                    sx={{ pl: 4 }}
-                    onClick={handleClose} // Close the drawer on item click
-                  >
-                    <ListItemText primary={grade} />
-                  </ListItem>
-                ))}
-              </List>
-            </Collapse>
-          </React.Fragment>
         ))}
         {/* Admin routes */}
         {isAuthenticated && (

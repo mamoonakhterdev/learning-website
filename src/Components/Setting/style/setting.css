@@ -1,0 +1,77 @@
+.settings-container {
+    background-color: white;
+    width: 70%;
+    margin: 50px auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  
+  .settings-menu {
+    width: 30%;
+  }
+  
+  .settings-content {
+    width: 65%;
+  }
+  
+  .list-group-item {
+    cursor: pointer;
+  }
+  
+  .list-group-item.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .verified-icon {
+    color: green;
+    margin-left: 10px;
+  }
+  
+  .unverified-icon {
+    color: red;
+    margin-left: 10px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .settings-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .settings-menu,
+    .settings-content {
+      width: 100%;
+      text-align: center;
+    }
+  
+    .settings-menu {
+      margin-bottom: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .settings-container {
+      padding: 10px;
+    }
+  
+    .form-group label {
+      display: block;
+      text-align: left;
+    }
+  
+    .form-group input {
+      width: 100%;
+    }
+  }
+  

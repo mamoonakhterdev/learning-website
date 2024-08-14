@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import { auth, database } from '../../firebaseConfig';
-import { ref, get, child } from 'firebase/database';
+import { ref, get } from 'firebase/database';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './style/login.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
+import { ClientContext } from './ClientContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { setUserData } = useContext(ClientContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,33 +23,26 @@ const Login = () => {
       const user = userCredential.user;
       const token = await user.getIdToken();
 
-      // Store the token in cookies
-      Cookies.set('jwt', token, { expires: 1 });
-
+      Cookies.set('jwt', token, { expires: 1, secure: true, sameSite: 'None' });
       if (user.emailVerified) {
-        console.log('Email Verified',user.emailVerified);
-        console.log('User Data: ', user);
         const userInfoRef = ref(database, 'userInfo');
         const snapshot = await get(userInfoRef);
+
         if (snapshot.exists()) {
           const userInfo = snapshot.val();
           let userData = null;
 
           for (const key in userInfo) {
-            console.log(user.uid, ' === ', userInfo[key].uid);
             if (userInfo[key].uid === user.uid) {
               userData = userInfo[key];
               break;
             }
           }
 
+
           if (userData) {
-            console.log('User Data:', userData);
-
-            // Show success message
+            setUserData(userData);
             toast.success('Login successful');
-
-            // Redirect to home page
             setTimeout(() => {
               navigate('/');
             }, 3000);
@@ -55,7 +50,7 @@ const Login = () => {
             toast.error('User data does not exist!');
           }
         } else {
-          toast.error('Incorrect ');
+          toast.error('User data does not exist!');
         }
       } else {
         toast.error('Please verify your email before logging in.');

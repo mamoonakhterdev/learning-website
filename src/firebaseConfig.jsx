@@ -1,9 +1,10 @@
 // src/firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence, EmailAuthProvider } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { getAnalytics } from "firebase/analytics";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, reauthenticateWithCredential } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCRou-zTyeOoQbnktSwNY1f33EsdxXHCZ4",
@@ -22,4 +23,8 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 const analytics = getAnalytics(app);
 
-export { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword,database, ref, get, analytics };
+const storage = getStorage(app);
+
+setPersistence(auth, browserLocalPersistence);
+
+export { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword,database, ref, get, analytics, EmailAuthProvider, reauthenticateWithCredential, storage };

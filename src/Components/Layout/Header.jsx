@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, TextField, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -7,8 +7,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Link, useNavigate } from 'react-router-dom';
 import DrawerComponent from '../Drawar/Drawar';
 import Cookies from 'js-cookie';
-import { Logout } from '@mui/icons-material';
-
+import { Height, Logout } from '@mui/icons-material';
+import { ClientContext } from '../../Route/ClientAuth/ClientContext';
+import user from './../../assets/images/user.png';
 const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -17,7 +18,7 @@ const Header = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const {userData} = useContext(ClientContext)
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -78,6 +79,7 @@ const Header = () => {
           >
             <MenuIcon />
           </IconButton>
+          {userData?.profileImage === null ? <img src={user} alt="Profile Image" className='profile-header' />:<img src={userData?.profileImage} alt="Profile Image" className='profile-header' />}
           <Typography
             variant="h6"
             sx={{

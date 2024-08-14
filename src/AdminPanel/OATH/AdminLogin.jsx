@@ -27,12 +27,12 @@ const AdminLogin = () => {
   const navigate = useNavigate();
 
   const checkAdminCredentials = async (email, password) => {
-    const adminRef = ref(database, 'admin'); // Replace '.' in email with '_' for Firebase key compatibility
+    const adminRef = ref(database, 'admin');
     const adminSnap = await get(adminRef);
     console.log(adminRef);
     if (adminSnap.exists()) {
       const adminData = adminSnap.val();
-      return adminData.password === password; // You should hash passwords in a real-world application
+      return adminData.password === password; 
     }
     return false;
   };

@@ -1,25 +1,22 @@
-// src/ClientAuth/ClientRoute.jsx
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { ClientContext } from './ClientContext'; // Import ClientContext
-import { useLocation } from 'react-router-dom';
-
+import { ClientContext } from './ClientContext';
+import Cookies from 'js-cookie';
 const ClientRoute = ({ element: Element, ...rest }) => {
-  const { isAuthenticated } = useContext(ClientContext); // Access authentication status
-  const location = useLocation();
+  const { isAuthenticated } = useContext(ClientContext);
+  const token = Cookies.get("jwt");
+  if (isAuthenticated === null) {
+    // Return null or a loading spinner if `isAuthenticated` is still being determined
+    return <div>Loading...</div>;
+  }
 
-  // Allow access to login and signup pages only for unauthenticated users
-  if (!isAuthenticated && (location.pathname === '/login' || location.pathname === '/signup')) {
+  if (token) {
+    console.log("Authenticated");
     return Element;
+  } else {
+    console.log("Not Authenticated");
+    return <Navigate to="/login" replace />;
   }
-
-  // Redirect authenticated users away from login and signup pages
-  if (isAuthenticated && (location.pathname === '/login' || location.pathname === '/signup')) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Handle private routes
-  return isAuthenticated ? Element : <Navigate to="/login" replace />;
 };
 
 export default ClientRoute;
